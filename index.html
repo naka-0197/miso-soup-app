@@ -1,296 +1,948 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-    <meta http-equiv="Pragma" content="no-cache" />
-    <meta http-equiv="Expires" content="0" />
-    <title>Cookie check</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <style>
-      :root {
-        color-scheme: light dark;
-      }
-
-      body {
-        font-family: 'Inter', Helvetica, Arial, sans-serif;
-        background: light-dark(#F8F8F7, #191919);
-        color: light-dark(#1f1f1f, #e3e3e3);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        box-sizing: border-box;
-        min-height: 100vh;
-        margin: 0;
-        padding: 20px;
-        text-align: center;
-      }
-
-      .container {
-        background: light-dark(#FFFFFF, #1F1F1F);
-        padding: 32px;
-        border-radius: 16px;
-        border: 1px solid light-dark(#E2E3E4, #3E3E3E);
-        max-width: min(80%, 500px);
-        width: 100%;
-        color: light-dark(#2B2D31, #D4D4D4);
-      }
-
-      h1 {
-        font-size: 20px;
-        font-weight: 500;
-        margin-top: 1rem;
-        margin-bottom: 1rem;
-        color: light-dark(#2B2D31, #D4D4D4);
-      }
-
-      p {
-        font-size: 14px;
-        color: light-dark(#2B2D31, #D4D4D4);
-        line-height: 21px;
-        margin: 0 0 1.5rem 0;
-      }
-
-      .icon {
-        margin-bottom: 1rem;
-        line-height: 0;
-      }
-
-      .button-container {
-        display: flex;
-        justify-content: flex-end;
-        gap: 10px;
-        margin-top: 2rem;
-      }
-
-      button {
-        background-color: light-dark(#fff, #323232);
-        color: light-dark(#2B2D31, #FCFCFC);
-        border: 1px solid light-dark(#E2E3E4, #3E3E3E);
-        border-radius: 12px;
-        padding: 8px 12px;
-        font-size: 14px;
-        line-height: 21px;
-        cursor: pointer;
-        transition: background-color 0.2s;
-        font-weight: 400;
-        font-family: 'Inter', Helvetica, Arial, sans-serif;
-        width: 100%;
-      }
-
-      button:hover {
-        background-color: light-dark(#EAEAEB, #424242);
-      }
-
-      .hidden {
-        display: none;
-      }
-
-      /* Loading Spinner Animation */
-      .spinner {
-        margin: 0 auto 1.5rem auto;
-        width: 40px;
-        height: 40px;
-        border: 4px solid light-dark(#f0f0f0, #262626);
-        border-top: 4px solid light-dark(#076eff, #87a9ff); /* Blue color */
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-      }
-
-      .logo {
-        border-radius: 10px;
-        display: block;
-        margin: 0 auto 2rem auto;
-      }
-
-      .logo.hidden {
-        display: none;
-      }
-
-      @keyframes spin {
-        0% {
-          transform: rotate(0deg);
-        }
-        100% {
-          transform: rotate(360deg);
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>一汁一菜・心身を労わる今日のお味噌汁</title>
+  <meta name="description" content="一汁一菜の思想を継承し、今日の気分や体調に寄り添うお味噌汁レシピ提案＆Supabase記録アプリ">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            washi: '#FAF6F0',
+            miso: {
+              50: '#FDF8F3',
+              100: '#F7EDE2',
+              200: '#EBD4BC',
+              500: '#C86D3B',
+              600: '#B25B2A',
+              800: '#7E3814',
+            },
+          },
+          fontFamily: {
+            serif: ['"Shippori Mincho"', '"Noto Serif JP"', 'serif'],
+            sans: ['"Zen Kaku Gothic New"', 'sans-serif'],
+          }
         }
       }
-    </style>
-  </head>
-  <body>
-    <div class="container">
-      <img
-        class="logo"
-        src="https://www.gstatic.com/images/branding/productlogos/ai_studio/v1/web-512dp/logo_ai_studio_color_1x_web_512dp.png"
-        alt="AI Studio Logo"
-        width="256"
-        height="256"
-      />
-      <div class="spinner"></div>
-      <div id="error-ui" class="hidden">
-        <div class="icon">
-          <svg
-            version="1.1"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            width="48px"
-            height="48px"
-            fill="#D73A49"
-          >
-            <path
-              d="M12,2C6.486,2,2,6.486,2,12s4.486,10,10,10s10-4.486,10-10S17.514,2,12,2z M13,17h-2v-2h2V17z M13,13h-2V7h2V13z"
-            />
-          </svg>
-        </div>
-        <div id="stepOne" class="text-container">
-          <h1>Action required to load your app</h1>
-          <p>
-            It looks like your browser is blocking a required security cookie, which is common on
-            older versions of iOS and Safari.
-          </p>
-          <div class="button-container">
-            <button id="authInSeparateWindowButton" onclick="redirectToReturnUrl(true)">Authenticate in new window</button>
-          </div>
-        </div>
-        <div id="stepTwo" class="text-container hidden">
-          <h1>Action required to load your app</h1>
-          <p>
-            It looks like your browser is blocking a required security cookie, which is common on
-            older versions of iOS and Safari.
-          </p>
-          <div class="button-container">
-            <button id="interactButton" onclick="redirectToReturnUrl(false)">Close and continue</button>
-          </div>
-        </div>
-        <div id="stepThree" class="text-container hidden">
-          <h1>Almost there!</h1>
-          <p>
-            Grant permission for the required security cookie below.
-          </p>
-          <div class="button-container">
-            <button id="grantPermissionButton" onclick="grantStorageAccess()">Grant permission</button>
-          </div>
-        </div>
+    };
+  </script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;600;700&family=Zen+Kaku+Gothic+New:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Supabase CDN (Pure JS) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    body {
+      background-color: #FAF6F0;
+      color: #2C2523;
+      font-family: 'Zen Kaku Gothic New', sans-serif;
+    }
+    .font-mincho {
+      font-family: 'Shippori Mincho', 'Noto Serif JP', serif;
+    }
+    .bg-washi-dot {
+      background-image: radial-gradient(#dfd4c5 0.75px, transparent 0.75px);
+      background-size: 20px 20px;
+    }
+    @keyframes rise-steam {
+      0% { opacity: 0; transform: translateY(0) scaleX(1); }
+      40% { opacity: 0.55; transform: translateY(-8px) scaleX(1.1); }
+      100% { opacity: 0; transform: translateY(-22px) scaleX(1.25); }
+    }
+    .steam-1 { animation: rise-steam 3.2s infinite ease-out; }
+    .steam-2 { animation: rise-steam 3.6s infinite 1.2s ease-out; }
+    .steam-3 { animation: rise-steam 4s infinite 0.6s ease-out; }
+  </style>
+</head>
+<body class="bg-washi bg-washi-dot min-h-screen text-[#2c2523] pb-20">
+
+  <div class="max-w-5xl mx-auto px-4 py-8 md:py-12">
+    <!-- Header Controls -->
+    <div class="flex justify-between items-center mb-6 border-b border-[#e5d8c7] pb-3 text-xs">
+      <div class="flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-amber-600 animate-pulse"></span>
+        <span class="font-bold text-[#5c4a3b]">一汁一菜のこころ</span>
+        <span class="text-stone-400">|</span>
+        <span class="text-stone-500">心身を労わる今日の一杯</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <button id="btn-open-settings" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/90 hover:bg-white text-[#5c4a3b] border border-[#d6c7b3] shadow-xs transition">
+          <span>⚙️ 設定 (APIキー & Supabase)</span>
+        </button>
+        <button id="btn-open-sql" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-600 border border-stone-300 transition">
+          <span>SQL</span>
+        </button>
       </div>
     </div>
-    <script>
-      const AUTH_FLOW_TEST_COOKIE_NAME = '__SECURE-aistudio_auth_flow_may_set_cookies';
-      const COOKIE_VALUE = 'true';
 
-      function getCookie(name) {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-          let cookie = cookies[i].trim();
-          if (cookie.startsWith(name + '=')) {
-            return cookie.substring(name.length + 1);
+    <!-- Main Title -->
+    <header class="text-center mb-10">
+      <div class="inline-flex flex-col items-center justify-center mb-3">
+        <div class="flex justify-center gap-2 h-7 items-end mb-1">
+          <span class="w-1.5 h-5 bg-[#c86d3b]/50 rounded-full steam-1"></span>
+          <span class="w-1.5 h-7 bg-[#c86d3b]/70 rounded-full steam-2"></span>
+          <span class="w-1.5 h-4 bg-[#c86d3b]/50 rounded-full steam-3"></span>
+        </div>
+        <div class="w-14 h-14 rounded-full bg-[#f3e7d8] border border-[#d6c4b0] flex items-center justify-center text-2xl shadow-inner">
+          🍲
+        </div>
+      </div>
+      <h1 class="text-3xl md:text-4xl font-mincho font-bold tracking-wider text-[#35251d] mb-2">
+        一汁一菜・今日のお味噌汁
+      </h1>
+      <p class="text-xs md:text-sm text-[#79624e] tracking-widest font-mincho mb-4">
+        一汁一菜の思想を継承し、心身をそっと労わる一杯
+      </p>
+      <div class="max-w-xl mx-auto p-3.5 bg-[#f5ede1]/85 rounded-xl border border-[#e4d4bf] text-xs text-[#5d4c3d] leading-relaxed font-mincho shadow-xs">
+        「一汁一菜でええんです。一生懸命ごちそうを作らんでも、具だくさんのお味噌汁とお茶碗のご飯があれば、命を養うには充分なんですよ。」
+      </div>
+    </header>
+
+    <!-- Main 2-Column Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-8 mb-12">
+      <!-- LEFT COLUMN: Input Form -->
+      <div class="md:col-span-5 space-y-6 bg-white/95 p-6 rounded-2xl border border-[#e4d8c8] shadow-sm">
+        <h2 class="text-base font-mincho font-bold text-[#35251d] border-b pb-2.5 border-[#e6dbc9] flex items-center gap-2">
+          <span>🍵</span> いまの心と身体の状態
+        </h2>
+
+        <!-- Mood -->
+        <div>
+          <label class="block text-xs font-bold text-[#5c4a3b] mb-1.5">今日の気分</label>
+          <div class="flex flex-wrap gap-1.5 mb-2" id="mood-tags"></div>
+          <input
+            type="text"
+            id="input-mood"
+            class="w-full text-xs p-2.5 rounded-xl border border-[#d6c7b2] bg-[#fbf9f6] text-stone-800 focus:outline-none focus:border-[#c86d3b]"
+            placeholder="例：仕事で気疲れした、ゆっくり休みたい"
+          />
+        </div>
+
+        <!-- Condition -->
+        <div>
+          <label class="block text-xs font-bold text-[#5c4a3b] mb-1.5">今日の体調</label>
+          <div class="flex flex-wrap gap-1.5 mb-2" id="condition-tags"></div>
+          <input
+            type="text"
+            id="input-condition"
+            class="w-full text-xs p-2.5 rounded-xl border border-[#d6c7b2] bg-[#fbf9f6] text-stone-800 focus:outline-none focus:border-[#c86d3b]"
+            placeholder="例：お腹が冷えている、消化の良いものが食べたい"
+          />
+        </div>
+
+        <!-- Liked Ingredients -->
+        <div>
+          <label class="block text-xs font-bold text-[#5c4a3b] mb-1">好きな食材（入れてほしいもの）</label>
+          <div class="flex gap-2 mb-2">
+            <input
+              type="text"
+              id="input-liked"
+              class="flex-1 text-xs p-2 rounded-xl border border-[#d6c7b2] bg-[#fbf9f6]"
+              placeholder="例：大根、油揚げ、豆腐、きのこ"
+            />
+            <button id="btn-add-liked" class="text-xs bg-[#eadecc] hover:bg-[#d8c5ad] text-[#49392e] px-3.5 py-2 rounded-xl font-medium transition">
+              追加
+            </button>
+          </div>
+          <div class="flex flex-wrap gap-1.5 min-h-[24px]" id="liked-pills"></div>
+        </div>
+
+        <!-- Disliked Ingredients -->
+        <div>
+          <label class="block text-xs font-bold text-[#5c4a3b] mb-1">苦手・避けたい食材</label>
+          <div class="flex gap-2 mb-2">
+            <input
+              type="text"
+              id="input-disliked"
+              class="flex-1 text-xs p-2 rounded-xl border border-[#d6c7b2] bg-[#fbf9f6]"
+              placeholder="例：ネギ、こんにゃく"
+            />
+            <button id="btn-add-disliked" class="text-xs bg-[#eadecc] hover:bg-[#d8c5ad] text-[#49392e] px-3.5 py-2 rounded-xl font-medium transition">
+              追加
+            </button>
+          </div>
+          <div class="flex flex-wrap gap-1.5 min-h-[24px]" id="disliked-pills"></div>
+        </div>
+
+        <!-- Weather & Season -->
+        <div class="bg-[#fbf7f0] p-3.5 rounded-xl border border-[#e6dbc9] text-xs space-y-2.5">
+          <div class="flex justify-between items-center text-[#6e5845]">
+            <span>季節: <strong id="val-season">秋 (Autumn)</strong></span>
+            <span>気温: <strong id="val-temp">18℃</strong></span>
+          </div>
+          <div class="flex gap-2">
+            <input
+              type="text"
+              id="input-weather"
+              class="flex-1 text-xs p-1.5 rounded-lg border border-[#d6c7b2] bg-white"
+              value="少し肌寒い"
+              placeholder="天気・体感（例：雨模様で冷える）"
+            />
+            <button id="btn-get-gps" class="text-[11px] px-2.5 py-1 bg-amber-100 hover:bg-amber-200 text-amber-900 rounded-lg font-medium transition">
+              GPS天気
+            </button>
+          </div>
+        </div>
+
+        <!-- Generate Button -->
+        <button
+          id="btn-generate"
+          class="w-full py-4 px-4 bg-gradient-to-r from-[#ba5d2d] to-[#c86d3b] hover:from-[#a75225] hover:to-[#b35e2e] text-white font-mincho font-bold text-base rounded-2xl shadow-md hover:shadow-lg transition flex items-center justify-center gap-2 cursor-pointer"
+        >
+          <span>🍲</span>
+          <span id="txt-generate-btn">今日のお味噌汁を提案してもらう</span>
+        </button>
+      </div>
+
+      <!-- RIGHT COLUMN: Recipe Display or Waiting Card -->
+      <div class="md:col-span-7" id="recipe-container">
+        <!-- Rendered by JavaScript -->
+      </div>
+    </div>
+
+    <!-- Past Miso Soup Logs -->
+    <section class="bg-white/95 p-6 md:p-8 rounded-2xl border border-[#decbb7] shadow-sm">
+      <div class="flex justify-between items-center mb-6 border-b border-[#e9dcce] pb-3">
+        <div>
+          <h3 class="text-xl font-mincho font-bold text-[#35251d] flex items-center gap-2">
+            <span>📖</span> これまでの味噌汁ログ一覧
+            <span class="text-xs font-normal text-[#8c745f]" id="logs-count">(0件)</span>
+          </h3>
+          <p class="text-xs text-stone-500 mt-1" id="sync-notice">
+            ブラウザのLocalStorageに保存されています。
+          </p>
+        </div>
+      </div>
+      <div id="logs-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Filled by JS -->
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="mt-14 text-center text-xs text-[#8c745f] border-t border-[#e2d5c3] pt-6 font-mincho">
+      一汁一菜・心身を労わる今日のお味噌汁 — 一汁一菜の思想に敬意を込めて
+    </footer>
+  </div>
+
+  <!-- Settings Modal -->
+  <div id="modal-settings" class="hidden fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+    <div class="bg-white w-full max-w-md rounded-2xl p-6 shadow-2xl border border-[#d6c7b3] space-y-4">
+      <div class="flex justify-between items-center border-b pb-2">
+        <h4 class="font-mincho font-bold text-base text-[#38261c]">⚙️ 設定 (APIキー & Supabase)</h4>
+        <button id="btn-close-settings" class="text-stone-400 hover:text-black text-xl">&times;</button>
+      </div>
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block font-bold text-[#4e3d2f] mb-1">Gemini API Key</label>
+          <input
+            type="password"
+            id="cfg-gemini-key"
+            placeholder="AIzaSy..."
+            class="w-full p-2.5 rounded-lg border border-[#d6c7b2] bg-[#fbf9f6]"
+          />
+          <p class="text-[11px] text-[#8e7a68] mt-1">※ 未入力の場合は見本レシピを即座に生成します。APIキーを入れるとGeminiが毎回オリジナルを考案します。</p>
+        </div>
+        <div class="pt-2 border-t border-stone-100">
+          <label class="block font-bold text-[#4e3d2f] mb-1">Supabase Project URL</label>
+          <input
+            type="text"
+            id="cfg-supabase-url"
+            placeholder="https://xyz.supabase.co"
+            class="w-full p-2.5 rounded-lg border border-[#d6c7b2] bg-[#fbf9f6]"
+          />
+        </div>
+        <div>
+          <label class="block font-bold text-[#4e3d2f] mb-1">Supabase Anon Key</label>
+          <input
+            type="password"
+            id="cfg-supabase-key"
+            placeholder="eyJhbGciOiJIUzI1NiIsIn..."
+            class="w-full p-2.5 rounded-lg border border-[#d6c7b2] bg-[#fbf9f6]"
+          />
+        </div>
+      </div>
+      <div class="pt-2 flex justify-end gap-2">
+        <button id="btn-cancel-settings" class="px-4 py-2 rounded-lg text-xs text-stone-600 hover:bg-stone-100">キャンセル</button>
+        <button id="btn-save-settings" class="px-5 py-2 rounded-lg text-xs font-bold text-white bg-[#c86d3b] hover:bg-[#b25b2a] shadow">保存する</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SQL Modal -->
+  <div id="modal-sql" class="hidden fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+    <div class="bg-white w-full max-w-lg rounded-2xl p-6 shadow-2xl border border-[#d6c7b3] space-y-4">
+      <div class="flex justify-between items-center border-b pb-2">
+        <h4 class="font-mincho font-bold text-base text-[#38261c]">Supabase テーブル作成SQL</h4>
+        <button id="btn-close-sql" class="text-stone-400 hover:text-black text-xl">&times;</button>
+      </div>
+      <p class="text-xs text-stone-600">Supabaseの「SQL Editor」に貼り付けてRunを実行してください：</p>
+      <pre class="bg-[#241e1b] text-amber-100/90 p-4 rounded-xl text-[11px] overflow-x-auto font-mono select-all">
+create table if not exists miso_logs (
+  id uuid default gen_random_uuid() primary key,
+  created_at timestamptz default now(),
+  title text not null,
+  catchphrase text,
+  mood text,
+  condition text,
+  season text,
+  weather text,
+  season_story text,
+  ingredients jsonb,
+  miso_type text,
+  dashi_tip text,
+  steps jsonb,
+  cooking_wisdom text
+);
+
+alter table miso_logs enable row level security;
+create policy "Allow all public operations" on miso_logs for all using (true) with check (true);</pre>
+      <div class="text-right">
+        <button id="btn-copy-sql" class="px-4 py-2 bg-[#4a6b5d] text-white text-xs font-bold rounded-lg hover:bg-[#3d5a4d]">
+          SQLをコピー
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pure JavaScript Logic (No Babel, No Wrappers, Instant Load) -->
+  <script>
+    const state = {
+      mood: 'ほっと一息つきたい',
+      condition: '少し胃が重い・冷え性',
+      likedIngredients: ['大根', '油揚げ'],
+      dislikedIngredients: [],
+      season: '秋 (Autumn)',
+      weather: '少し肌寒い',
+      temperature: '18',
+      currentRecipe: null,
+      loading: false,
+      logs: [],
+      supabaseClient: null,
+      saveStatus: null
+    };
+
+    const MOOD_OPTIONS = ['ほっと一息つきたい', '疲れた・ヘトヘト', '元気を出したい', '焦りを鎮めたい', '静かに過ごしたい', '肩の力を抜きたい'];
+    const CONDITION_OPTIONS = ['胃がもたれている', '冷え性・手足が冷たい', '体が重だるい', '喉が乾燥している', 'すっきり快調', '消化にいいものがいい'];
+
+    function getTsukineKyokoSvg(title, ingredients) {
+      const isKinoko = /きのこ|舞茸|しめじ|さつまいも|芋/.test(title || '') ||
+        (ingredients && ingredients.some(x => /きのこ|舞茸|しめじ|さつまいも|芋/.test(x.name || '')));
+
+      return `
+        <div class="overflow-hidden rounded-2xl border-2 border-[#e6dbc8] bg-[#fdfbf7] shadow-sm mb-4">
+          <div class="relative p-6 bg-gradient-to-b from-[#faf4ea] to-[#f4ebdb] flex flex-col items-center justify-center min-h-[250px]">
+            <svg viewBox="0 0 400 240" class="w-full max-w-sm h-auto drop-shadow-md">
+              <defs>
+                <linearGradient id="soupGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#e8aa5a" stop-opacity="0.9" />
+                  <stop offset="100%" stop-color="#bf7332" stop-opacity="0.95" />
+                </linearGradient>
+                <linearGradient id="bowlGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#5c4436" />
+                  <stop offset="100%" stop-color="#3d2a20" />
+                </linearGradient>
+                <filter id="watercolorWash">
+                  <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="3" result="noise" />
+                  <feDisplacementMap in="SourceGraphic" in2="noise" scale="3" />
+                </filter>
+              </defs>
+
+              <ellipse cx="200" cy="205" rx="170" ry="24" fill="#decab4" opacity="0.6" />
+              <rect x="50" y="200" width="300" height="12" rx="4" fill="#b99e82" opacity="0.8" />
+
+              <path d="M 175 110 Q 165 85 180 60 Q 195 35 180 15" stroke="#c86d3b" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.45" />
+              <path d="M 200 100 Q 215 75 198 50 Q 185 25 205 8" stroke="#c86d3b" stroke-width="3" stroke-linecap="round" fill="none" opacity="0.55" />
+              <path d="M 225 110 Q 235 85 220 60 Q 210 35 228 18" stroke="#c86d3b" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.45" />
+
+              <ellipse cx="200" cy="180" rx="90" ry="25" fill="#2b1c15" opacity="0.3" />
+              <path d="M 100 130 C 100 200, 300 200, 300 130 Z" fill="url(#bowlGrad)" stroke="#2b1c15" stroke-width="3" filter="url(#watercolorWash)" />
+              
+              <ellipse cx="200" cy="130" rx="100" ry="26" fill="#4d372c" stroke="#2b1c15" stroke-width="2.5" />
+              <ellipse cx="200" cy="130" rx="95" ry="22" fill="url(#soupGrad)" />
+
+              ${isKinoko ? `
+                <g filter="url(#watercolorWash)">
+                  <ellipse cx="160" cy="130" rx="18" ry="12" fill="#ffd166" stroke="#8d4004" stroke-width="2" />
+                  <path d="M 144 125 Q 160 120 176 125" stroke="#843b62" stroke-width="3" fill="none" />
+                  <ellipse cx="230" cy="126" rx="16" ry="10" fill="#a47148" stroke="#52321a" stroke-width="2" />
+                  <path d="M 228 135 L 224 148" stroke="#eed9c4" stroke-width="4" stroke-linecap="round" />
+                  <ellipse cx="245" cy="132" rx="13" ry="8" fill="#8c5835" stroke="#52321a" stroke-width="2" />
+                  <polygon points="190,132 208,127 218,135 200,140" fill="#fffdfa" stroke="#d5c2ad" stroke-width="1.5" />
+                </g>
+              ` : `
+                <g filter="url(#watercolorWash)">
+                  <polygon points="150,132 175,125 185,136 158,142" fill="#faf9f5" stroke="#cebca8" stroke-width="1.8" />
+                  <polygon points="215,128 245,123 252,135 220,140" fill="#faf9f5" stroke="#cebca8" stroke-width="1.8" />
+                  <rect x="180" y="125" width="28" height="14" rx="3" fill="#e09f3e" stroke="#9e5a1b" stroke-width="2" transform="rotate(-8 194 132)" />
+                </g>
+              `}
+
+              <circle cx="198" cy="126" r="4.5" fill="#52b788" stroke="#2d6a4f" stroke-width="1.2" />
+              <circle cx="207" cy="129" r="4" fill="#74c69d" stroke="#2d6a4f" stroke-width="1.2" />
+              <circle cx="192" cy="132" r="3.5" fill="#52b788" stroke="#2d6a4f" stroke-width="1" />
+              <circle cx="203" cy="135" r="4" fill="#40916c" stroke="#1b4332" stroke-width="1.2" />
+
+              <rect x="150" y="212" width="130" height="3" rx="1.5" fill="#8d5b4c" transform="rotate(-3 215 213)" />
+              <rect x="148" y="215" width="130" height="3" rx="1.5" fill="#6f4235" transform="rotate(-3 213 216)" />
+              <rect x="250" y="209" width="14" height="9" rx="2" fill="#52796f" stroke="#2f3e46" stroke-width="1" />
+            </svg>
+
+            <div class="absolute top-3 left-3 bg-[#fdfaf5]/90 px-3 py-1 rounded-full border border-[#ded0be] text-[11px] font-mincho text-[#4c3a2b] shadow-xs">
+              🖌️ 月根京子風 水彩画イラスト（完成イメージ）
+            </div>
+          </div>
+          <div class="p-3 bg-[#faf5ed] border-t border-[#eedfcb] flex justify-between items-center text-[11px] text-[#78614e] font-mincho">
+            <span>器に盛られた温かい一椀。立ちのぼる湯気と素材の香り。</span>
+            <span class="text-[#c86d3b]">一汁一菜のこころ</span>
+          </div>
+        </div>
+      `;
+    }
+
+    function render() {
+      const moodContainer = document.getElementById('mood-tags');
+      moodContainer.innerHTML = MOOD_OPTIONS.map(tag => `
+        <button type="button" class="btn-mood-chip text-xs px-2.5 py-1 rounded-full transition border ${
+          state.mood === tag ? 'bg-amber-700 text-white border-amber-700' : 'bg-[#faf6f0] text-[#5a483a] border-[#e2d5c3] hover:border-amber-600'
+        }" data-tag="${tag}">${tag}</button>
+      `).join('');
+
+      const condContainer = document.getElementById('condition-tags');
+      condContainer.innerHTML = CONDITION_OPTIONS.map(tag => `
+        <button type="button" class="btn-cond-chip text-xs px-2.5 py-1 rounded-full transition border ${
+          state.condition === tag ? 'bg-amber-700 text-white border-amber-700' : 'bg-[#faf6f0] text-[#5a483a] border-[#e2d5c3] hover:border-amber-600'
+        }" data-tag="${tag}">${tag}</button>
+      `).join('');
+
+      const likedContainer = document.getElementById('liked-pills');
+      likedContainer.innerHTML = state.likedIngredients.map(item => `
+        <span class="inline-flex items-center gap-1 text-xs px-2.5 py-0.5 rounded-full bg-[#f4ece1] border border-[#dac8b3] text-[#4a3a2d]">
+          ${item}
+          <button class="btn-del-liked font-bold ml-1 text-stone-400 hover:text-red-600" data-item="${item}">&times;</button>
+        </span>
+      `).join('');
+
+      const dislikedContainer = document.getElementById('disliked-pills');
+      if (state.dislikedIngredients.length === 0) {
+        dislikedContainer.innerHTML = '<span class="text-[11px] text-stone-400">特になし</span>';
+      } else {
+        dislikedContainer.innerHTML = state.dislikedIngredients.map(item => `
+          <span class="inline-flex items-center gap-1 text-xs px-2.5 py-0.5 rounded-full bg-rose-50 border border-rose-200 text-rose-800">
+            ${item}
+            <button class="btn-del-disliked font-bold ml-1 text-rose-400 hover:text-rose-700" data-item="${item}">&times;</button>
+          </span>
+        `).join('');
+      }
+
+      const recipeBox = document.getElementById('recipe-container');
+      if (state.loading) {
+        recipeBox.innerHTML = `
+          <div class="bg-white/95 rounded-2xl border border-[#decbb7] p-10 text-center shadow-sm flex flex-col items-center justify-center min-h-[460px]">
+            <div class="text-4xl animate-bounce mb-4">🍲</div>
+            <h3 class="font-mincho text-lg font-bold text-stone-800 mb-2">旬の恵みと、あなたの体調を合わせています…</h3>
+            <p class="text-xs text-stone-500 mb-6 font-mincho">心身をそっと労わるお味噌汁を考案中です。</p>
+            <div class="max-w-md bg-amber-50/80 p-4 rounded-xl border border-amber-200/60 text-xs text-[#523e2d] font-mincho italic leading-relaxed">
+              「一汁一菜でええんです。具だくさんのお味噌汁とお茶碗一杯のご飯。それで充分なんですよ。」
+            </div>
+          </div>
+        `;
+      } else if (state.currentRecipe) {
+        const r = state.currentRecipe;
+        recipeBox.innerHTML = `
+          <div class="bg-white/95 rounded-2xl border border-[#decbb7] p-6 md:p-8 shadow-sm space-y-6">
+            <div class="border-b border-[#e9dcce] pb-4">
+              ${r.catchphrase ? `<p class="text-xs font-bold text-[#c86d3b] tracking-widest mb-1 font-mincho">【${r.catchphrase}】</p>` : ''}
+              <h2 class="text-2xl md:text-3xl font-mincho font-bold text-[#2e2018] tracking-wide leading-snug">${r.title}</h2>
+            </div>
+
+            ${getTsukineKyokoSvg(r.title, r.ingredients)}
+
+            ${r.season_story ? `
+              <div class="p-3.5 bg-[#faf5ed] rounded-xl border border-[#eedfcb] text-xs text-[#5d4c3d] leading-relaxed">
+                <span class="font-bold text-[#c86d3b] mr-1">🍃 旬のめぐり:</span>${r.season_story}
+              </div>
+            ` : ''}
+
+            <div>
+              <h3 class="text-sm font-bold text-[#443225] font-mincho mb-2.5 flex items-center justify-between">
+                <span>🥢 具材（1〜2人分・気負わんでええ分量）</span>
+                <span class="text-[11px] font-normal text-stone-500 font-sans">味噌: ${r.miso_type || 'お好みの味噌'}</span>
+              </h3>
+              <div class="bg-[#faf6f0] rounded-xl p-3.5 border border-[#e8ddce] divide-y divide-[#ece2d5]">
+                ${r.ingredients.map(ing => `
+                  <div class="py-2 flex justify-between items-start text-xs text-[#413125]">
+                    <div>
+                      <span class="font-bold text-[#2d2119] font-mincho">${ing.name}</span>
+                      ${ing.prep ? `<span class="text-[#846f5e] ml-2 font-sans">(${ing.prep})</span>` : ''}
+                    </div>
+                    <span class="text-[#8c5a35] font-medium font-sans ml-4 shrink-0 bg-white/70 px-2.5 py-0.5 rounded border border-[#e4d6c4]">${ing.amount}</span>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+
+            <div>
+              <h3 class="text-sm font-bold text-[#443225] font-mincho mb-2.5">🔥 作り方（気負わんでよろしい）</h3>
+              <ol class="space-y-2.5 text-xs text-[#423326]">
+                ${r.steps.map((st, i) => `
+                  <li class="flex gap-3 bg-[#fdfbf7] p-2.5 rounded-lg border border-[#ede5d8]">
+                    <span class="font-bold text-[#c86d3b] font-mincho text-sm shrink-0 w-5">${i + 1}.</span>
+                    <span class="leading-relaxed">${st}</span>
+                  </li>
+                `).join('')}
+              </ol>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+              ${r.dashi_tip ? `
+                <div class="p-3 bg-[#f6eee2] rounded-lg border border-[#e3d2be]">
+                  <span class="font-bold text-[#624730] block mb-1">🐟 お出汁の極意</span>
+                  <p class="text-[#5a483a] leading-relaxed">${r.dashi_tip}</p>
+                </div>
+              ` : ''}
+              ${r.cooking_wisdom ? `
+                <div class="p-3 bg-[#eef3ee] rounded-lg border border-[#cbd9cb]">
+                  <span class="font-bold text-[#2d5038] block mb-1">🌿 暮らしの知恵</span>
+                  <p class="text-[#36523e] leading-relaxed">${r.cooking_wisdom}</p>
+                </div>
+              ` : ''}
+            </div>
+
+            <div class="pt-2 border-t border-[#eee2d3] flex flex-wrap items-center justify-between gap-3">
+              <div class="flex items-center gap-2">
+                <button id="btn-save-recipe" class="px-5 py-2.5 bg-[#4a6b5d] hover:bg-[#3d5a4d] text-white font-mincho text-xs font-bold rounded-xl shadow transition">
+                  💾 この味噌汁を記録する
+                </button>
+                <button id="btn-copy-recipe" class="px-4 py-2.5 bg-[#f0e6d8] hover:bg-[#e4d7c6] text-[#4d3a2b] font-mincho text-xs rounded-xl border border-[#d6c4af] transition">
+                  📋 レシピをコピー
+                </button>
+              </div>
+              <div id="save-status-msg" class="text-xs font-bold text-emerald-800"></div>
+            </div>
+          </div>
+        `;
+      } else {
+        recipeBox.innerHTML = `
+          <div class="bg-white/95 rounded-2xl border-2 border-dashed border-[#dfd2be] p-10 md:p-14 text-center shadow-sm flex flex-col items-center justify-center min-h-[460px] space-y-4">
+            <div class="w-20 h-20 rounded-full bg-[#fbf5ed] border border-[#e4d6c4] flex items-center justify-center text-amber-800 shadow-inner mb-2 text-3xl">
+              🍲
+            </div>
+            <h3 class="font-mincho text-xl font-bold text-[#322319] tracking-wide">
+              心身を労わる一杯を、ここにご提案します
+            </h3>
+            <p class="text-xs md:text-sm text-[#75604f] max-w-md leading-relaxed font-mincho">
+              左側のフォームで今日の「気分」や「体調」、お好きな具材をお選びいただき、
+              <br class="hidden sm:inline" />
+              <strong class="text-[#c86d3b]">「今日のお味噌汁を提案してもらう」</strong>ボタンを押してください。
+            </p>
+            <div class="pt-3 max-w-sm border-t border-[#eedfcb] text-[11px] text-[#937b67] leading-relaxed">
+              旬の食材や今日のお天気も考慮し、月根京子風の水彩画イメージとともに今日にふさわしいお味噌汁をお仕立てします。
+            </div>
+          </div>
+        `;
+      }
+
+      renderLogs();
+    }
+
+    function renderLogs() {
+      const logsCount = document.getElementById('logs-count');
+      const logsList = document.getElementById('logs-list');
+      logsCount.textContent = `(${state.logs.length}件)`;
+
+      if (state.logs.length === 0) {
+        logsList.innerHTML = `
+          <div class="col-span-full text-center py-8 text-xs text-stone-400 font-mincho">
+            まだ記録されたお味噌汁はありません。「この味噌汁を記録する」ボタンを押すとここに蓄積されます。
+          </div>
+        `;
+        return;
+      }
+
+      logsList.innerHTML = state.logs.map((log, idx) => `
+        <div class="bg-[#fbf8f3] p-4 rounded-xl border border-[#e5d9c9] space-y-2 text-xs flex flex-col justify-between">
+          <div class="space-y-1.5">
+            <div class="flex justify-between items-center text-[11px] text-[#937b67]">
+              <span>${log.created_at ? new Date(log.created_at).toLocaleDateString('ja-JP', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '日時未記録'}</span>
+              <span class="bg-[#ede2d2] px-2 py-0.5 rounded text-[10px] text-[#695240]">${log.season || '日常'}</span>
+            </div>
+            <h4 class="font-mincho font-bold text-sm text-[#38261c]">${log.title}</h4>
+            ${log.season_story ? `<p class="text-[#64503e] line-clamp-2 italic font-mincho text-[11px]">${log.season_story}</p>` : ''}
+          </div>
+          <div class="pt-2 border-t border-[#ebdcca] flex justify-between items-center">
+            <div class="flex gap-1 text-[10px] text-stone-500">
+              <span class="bg-white px-1.5 py-0.5 rounded border border-[#dfd2c0]">${log.mood || ''}</span>
+              <span class="bg-white px-1.5 py-0.5 rounded border border-[#dfd2c0]">${log.condition || ''}</span>
+            </div>
+            <button class="btn-del-log text-stone-400 hover:text-red-600 text-xs" data-id="${log.id || idx}">削除</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function setupEvents() {
+      document.addEventListener('click', e => {
+        if (e.target.classList.contains('btn-mood-chip')) {
+          state.mood = e.target.getAttribute('data-tag');
+          document.getElementById('input-mood').value = state.mood;
+          render();
+        }
+        if (e.target.classList.contains('btn-cond-chip')) {
+          state.condition = e.target.getAttribute('data-tag');
+          document.getElementById('input-condition').value = state.condition;
+          render();
+        }
+        if (e.target.classList.contains('btn-del-liked')) {
+          const item = e.target.getAttribute('data-item');
+          state.likedIngredients = state.likedIngredients.filter(x => x !== item);
+          render();
+        }
+        if (e.target.classList.contains('btn-del-disliked')) {
+          const item = e.target.getAttribute('data-item');
+          state.dislikedIngredients = state.dislikedIngredients.filter(x => x !== item);
+          render();
+        }
+        if (e.target.id === 'btn-save-recipe') {
+          saveCurrentRecipe();
+        }
+        if (e.target.id === 'btn-copy-recipe') {
+          copyRecipeText();
+        }
+        if (e.target.classList.contains('btn-del-log')) {
+          const id = e.target.getAttribute('data-id');
+          deleteLog(id);
+        }
+      });
+
+      document.getElementById('input-mood').addEventListener('input', e => { state.mood = e.target.value; });
+      document.getElementById('input-condition').addEventListener('input', e => { state.condition = e.target.value; });
+      document.getElementById('input-weather').addEventListener('input', e => { state.weather = e.target.value; });
+
+      document.getElementById('btn-add-liked').addEventListener('click', () => {
+        const inp = document.getElementById('input-liked');
+        const val = inp.value.trim();
+        if (val && !state.likedIngredients.includes(val)) {
+          state.likedIngredients.push(val);
+          inp.value = '';
+          render();
+        }
+      });
+      document.getElementById('input-liked').addEventListener('keydown', e => {
+        if (e.key === 'Enter') { e.preventDefault(); document.getElementById('btn-add-liked').click(); }
+      });
+
+      document.getElementById('btn-add-disliked').addEventListener('click', () => {
+        const inp = document.getElementById('input-disliked');
+        const val = inp.value.trim();
+        if (val && !state.dislikedIngredients.includes(val)) {
+          state.dislikedIngredients.push(val);
+          inp.value = '';
+          render();
+        }
+      });
+      document.getElementById('input-disliked').addEventListener('keydown', e => {
+        if (e.key === 'Enter') { e.preventDefault(); document.getElementById('btn-add-disliked').click(); }
+      });
+
+      document.getElementById('btn-get-gps').addEventListener('click', () => {
+        if (!navigator.geolocation) { alert('位置情報が取得できません。'); return; }
+        document.getElementById('btn-get-gps').textContent = '取得中...';
+        navigator.geolocation.getCurrentPosition(async pos => {
+          try {
+            const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${pos.coords.latitude}&longitude=${pos.coords.longitude}&current=temperature_2m,weather_code`);
+            const d = await res.json();
+            const temp = Math.round(d.current.temperature_2m);
+            state.temperature = String(temp);
+            document.getElementById('val-temp').textContent = temp + '℃';
+            state.weather = `快適な気候（体感${temp}℃）`;
+            document.getElementById('input-weather').value = state.weather;
+          } catch(e) {
+            console.error(e);
+          } finally {
+            document.getElementById('btn-get-gps').textContent = 'GPS天気';
           }
-        }
-        return null;
+        }, () => {
+          document.getElementById('btn-get-gps').textContent = 'GPS天気';
+        });
+      });
+
+      document.getElementById('btn-generate').addEventListener('click', generateRecipe);
+
+      document.getElementById('btn-open-settings').addEventListener('click', () => {
+        document.getElementById('cfg-gemini-key').value = localStorage.getItem('gemini_api_key') || '';
+        document.getElementById('cfg-supabase-url').value = localStorage.getItem('supabase_url') || '';
+        document.getElementById('cfg-supabase-key').value = localStorage.getItem('supabase_anon_key') || '';
+        document.getElementById('modal-settings').classList.remove('hidden');
+      });
+      document.getElementById('btn-close-settings').addEventListener('click', () => {
+        document.getElementById('modal-settings').classList.add('hidden');
+      });
+      document.getElementById('btn-cancel-settings').addEventListener('click', () => {
+        document.getElementById('modal-settings').classList.add('hidden');
+      });
+      document.getElementById('btn-save-settings').addEventListener('click', () => {
+        localStorage.setItem('gemini_api_key', document.getElementById('cfg-gemini-key').value.trim());
+        localStorage.setItem('supabase_url', document.getElementById('cfg-supabase-url').value.trim());
+        localStorage.setItem('supabase_anon_key', document.getElementById('cfg-supabase-key').value.trim());
+        document.getElementById('modal-settings').classList.add('hidden');
+        initSupabase();
+      });
+
+      document.getElementById('btn-open-sql').addEventListener('click', () => {
+        document.getElementById('modal-sql').classList.remove('hidden');
+      });
+      document.getElementById('btn-close-sql').addEventListener('click', () => {
+        document.getElementById('modal-sql').classList.add('hidden');
+      });
+      document.getElementById('btn-copy-sql').addEventListener('click', () => {
+        navigator.clipboard.writeText(`create table if not exists miso_logs (
+  id uuid default gen_random_uuid() primary key,
+  created_at timestamptz default now(),
+  title text not null,
+  catchphrase text,
+  mood text,
+  condition text,
+  season text,
+  weather text,
+  season_story text,
+  ingredients jsonb,
+  miso_type text,
+  dashi_tip text,
+  steps jsonb,
+  cooking_wisdom text
+);
+alter table miso_logs enable row level security;
+create policy "Allow all public operations" on miso_logs for all using (true) with check (true);`);
+        alert('SQLをコピーしました！');
+      });
+    }
+
+    async function generateRecipe() {
+      state.loading = true;
+      render();
+
+      const apiKey = localStorage.getItem('gemini_api_key');
+      if (!apiKey) {
+        setTimeout(() => {
+          state.currentRecipe = {
+            title: "焼き油揚げと甘み大根のしみじみ汁",
+            catchphrase: "具だくさんでええ。これ一杯で立派なごちそうや。",
+            season_story: "寒暖差のあるこの時期、大根はみずみずしさと甘みが増します。油揚げの香ばしさと合わさって、冷えた胃腸をじんわりと温めてくれます。",
+            ingredients: [
+              { name: "大根", amount: "5〜6cm（皮ごと乱切り）", prep: "よく洗って皮のまま一口大に" },
+              { name: "油揚げ", amount: "1枚", prep: "トースターやフライパンで軽く焦げ目がつくまで焼いて短冊切り" },
+              { name: "長ねぎ", amount: "1/3本", prep: "斜め薄切り" },
+              { name: "煮干し（またはかつお節）", amount: "3〜4本", prep: "頭も内臓も取らんでええ。そのまま水へ" },
+              { name: "味噌", amount: "大さじ1.5〜2", prep: "お好みの合わせ味噌" }
+            ],
+            miso_type: "田舎味噌 または 合わせ味噌",
+            dashi_tip: "煮干しは頭もハラワタも取らんでよろしい。水から大根と一緒に放り込んで煮るだけで、素材からええ出汁が出ます。",
+            steps: [
+              "鍋に水400mlと煮干し、皮ごと切った大根を入れて火にかけます。",
+              "大根にスッと串が通るまで、ことこと弱火で煮ます。アクも神経質に取らんでええです。",
+              "香ばしく焼いて切った油揚げを加え、ひと煮立ちさせたら火を止めます。",
+              "お味噌を溶き入れ、ねぎを散らして器によそいます。"
+            ],
+            cooking_wisdom: "食べる直前に、ごま油をほんのひと匙たらしても香ばしくて身体が芯から温まりますよ。残ったら翌朝温め直すと、味がしみて一段と美味しくなります。"
+          };
+          state.loading = false;
+          render();
+        }, 700);
+        return;
       }
 
-      function setAuthFlowTestCookie() {
-        // Set the cookie's TTL to 1 minute. This is a short lived cookie because it is only used
-        // when the user does not have an auth token or their auth token needs to be reset.
-        // Making this cookie too long-lived allows the user to get into a state where they can't
-        // mint a new auth token.
-        document.cookie = `${AUTH_FLOW_TEST_COOKIE_NAME}=${COOKIE_VALUE}; Path=/; Secure; SameSite=None; Domain=${window.location.hostname}; Partitioned; Max-Age=60;`;
-      }
+      try {
+        const prompt = `一汁一菜（いちじゅういっさい）の思想を継承したAI料理番として、心身を労わる実直なお味噌汁レシピを考案してください。
+※ 特定の研究者の個人名は出さず、「一汁一菜のこころ」として伝えてください。
+※ レシピ冒頭の長い挨拶メッセージは不要です。
 
-      /**
-       * Returns true if the test cookie is set, false otherwise.
-       */
-      function authFlowTestCookieIsSet() {
-        return getCookie(AUTH_FLOW_TEST_COOKIE_NAME) === COOKIE_VALUE;
-      }
+【状況】
+・気分: ${state.mood}
+・体調: ${state.condition}
+・好きな食材: ${state.likedIngredients.join(', ') || 'おまかせ'}
+・苦手な食材（絶対に使わない）: ${state.dislikedIngredients.join(', ') || 'なし'}
+・季節・気候: ${state.season} / ${state.weather} (${state.temperature}℃)
 
-      /**
-       * Redirects to the return url. If autoClose is true, then the return url will be opened in a
-       * new window, and it will be closed automatically when the page loads.
-       * Options:
-       *   storageAccessGranted: if true, appends __storage_access_granted=1 to
-       *   the return url so the Lua auth script can set the test cookie
-       *   server-side (needed for Safari/iOS where document.cookie is blocked).
-       */
-      async function redirectToReturnUrl(autoClose, storageAccessGranted = false) {
-        const initialReturnUrlStr = new URLSearchParams(window.location.search).get('return_url');
-        const returnUrl = initialReturnUrlStr ? new URL(initialReturnUrlStr) : null;
+以下の形式のJSONのみを出力してください（Markdownコードブロックは含めず、純粋なJSON文字列で）：
+{
+  "title": "お味噌汁の名称",
+  "catchphrase": "短いひと言見出し",
+  "season_story": "季節や天候、旬の食材がなぜこの身体に良いかの解説（120文字程度）",
+  "ingredients": [
+    {"name": "食材名", "amount": "分量", "prep": "簡単な下ごしらえ"}
+  ],
+  "miso_type": "おすすめのお味噌",
+  "dashi_tip": "出汁のアドバイス（煮干しをそのまま放り込む等）",
+  "steps": [
+    "手順1",
+    "手順2",
+    "手順3"
+  ],
+  "cooking_wisdom": "暮らしの知恵・美味しくなるひと工夫"
+}`;
 
-        // Prevent potentially malicious URLs from being used
-        if (returnUrl.protocol.toLowerCase() === 'javascript:') {
-          console.error('Potentially malicious return URL blocked');
-          return;
+        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey.trim()}`;
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: { responseMimeType: 'application/json' }
+          })
+        });
+
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.error?.message || 'Gemini APIエラー');
         }
 
-        if (storageAccessGranted) {
-          returnUrl.searchParams.set('__storage_access_granted', '1');
-        }
-
-        if (autoClose) {
-          returnUrl.searchParams.set('__auto_close', '1');
-          const url = new URL(window.location.href);
-          url.searchParams.set('return_url', returnUrl.toString());
-          // Land on the cookie check page first, so the user can interact with it before proceeding
-          // to the return url where cookies can be set.
-          window.open(url.toString(), '_blank');
-          const hasAccess = await document.hasStorageAccess();
-          document.querySelector('#stepOne').classList.add('hidden');
-          if (!hasAccess) {
-            document.querySelector('#stepThree').classList.remove('hidden');
-          } else {
-            window.location.reload();
-          }
-        } else {
-          window.location.href = returnUrl.toString();
-        }
+        const data = await res.json();
+        const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        const cleaned = text.replace(/\`\`\`json/g, '').replace(/\`\`\`/g, '').trim();
+        state.currentRecipe = JSON.parse(cleaned);
+      } catch (err) {
+        console.error(err);
+        alert('生成エラー: ' + err.message);
+      } finally {
+        state.loading = false;
+        render();
       }
+    }
 
-      /**
-       * Grants the browser permission to set cookies. If successful, then it redirects to the
-       * return url.
-       */
-      async function grantStorageAccess() {
+    async function saveCurrentRecipe() {
+      if (!state.currentRecipe) return;
+
+      const record = {
+        title: state.currentRecipe.title,
+        catchphrase: state.currentRecipe.catchphrase,
+        mood: state.mood,
+        condition: state.condition,
+        season: state.season,
+        weather: state.weather,
+        season_story: state.currentRecipe.season_story,
+        ingredients: state.currentRecipe.ingredients,
+        miso_type: state.currentRecipe.miso_type,
+        dashi_tip: state.currentRecipe.dashi_tip,
+        steps: state.currentRecipe.steps,
+        cooking_wisdom: state.currentRecipe.cooking_wisdom,
+        created_at: new Date().toISOString()
+      };
+
+      if (state.supabaseClient) {
         try {
-          await document.requestStorageAccess();
-          // Recent Safari/iOS versions block document.cookie entirely in
-          // cross-site iframes, even after requestStorageAccess(). Only
-          // server-side Set-Cookie headers work. Signal to the Lua auth script
-          // via query param so it can set the test cookie server-side.
-          redirectToReturnUrl(false, /* storageAccessGranted= */ true);
-        } catch (err) {
-          console.log('error after button click: ', err);
+          const { error } = await state.supabaseClient.from('miso_logs').insert([record]);
+          if (error) throw error;
+          fetchSupabaseLogs();
+          showSaveStatus('✓ Supabaseに記録しました！');
+          return;
+        } catch(e) {
+          console.warn('Supabase save error, fallback to local:', e);
         }
       }
 
-      /**
-       * Verifies that the browser can set cookies. If it can, then it redirects to the return url.
-       * If it can't, then it shows the error UI.
-       */
-      function verifyCanSetCookies() {
-        setAuthFlowTestCookie();
-        if (authFlowTestCookieIsSet()) {
-          // Check if we are on the auto-close flow, and if so show the interact button.
-          const returnUrl = new URLSearchParams(window.location.search).get('return_url');
-          const autoClose = new URL(returnUrl).searchParams.has('__auto_close');
-          if (autoClose) {
-            document.querySelector('#stepOne').classList.add('hidden');
-            document.querySelector('#stepTwo').classList.remove('hidden');
-          } else {
-            redirectToReturnUrl(false);
-            return;
-          }
-        }
-        // The cookie could not be set, so initiate the recovery flow.
-        document.querySelector('.logo').classList.add('hidden');
-        document.querySelector('.spinner').classList.add('hidden');
-        document.querySelector('#error-ui').classList.remove('hidden');
-      }
+      const current = JSON.parse(localStorage.getItem('miso_standalone_logs') || '[]');
+      const newRec = { ...record, id: 'local_' + Date.now() };
+      const updated = [newRec, ...current];
+      localStorage.setItem('miso_standalone_logs', JSON.stringify(updated));
+      state.logs = updated;
+      renderLogs();
+      showSaveStatus('✓ 端末内（LocalStorage）に記録しました！');
+    }
 
-      // Start the cookie verification process.
-      verifyCanSetCookies();
-    </script>
-  </body>
+    function showSaveStatus(msg) {
+      const el = document.getElementById('save-status-msg');
+      if (el) {
+        el.textContent = msg;
+        setTimeout(() => { if (el) el.textContent = ''; }, 3500);
+      }
+    }
+
+    function copyRecipeText() {
+      if (!state.currentRecipe) return;
+      const r = state.currentRecipe;
+      const text = `【一汁一菜・今日のお味噌汁】\n${r.title}\n${r.catchphrase || ''}\n\n【具材】\n${r.ingredients.map(x => `・${x.name} (${x.amount})`).join('\n')}\n\n【作り方】\n${r.steps.map((s, i) => `${i + 1}. ${s}`).join('\n')}\n\n【暮らしの知恵】\n${r.cooking_wisdom || ''}`;
+      navigator.clipboard.writeText(text);
+      alert('レシピをクリップボードにコピーしました！');
+    }
+
+    function deleteLog(id) {
+      if (!confirm('この記録を削除しますか？')) return;
+      if (state.supabaseClient && !String(id).startsWith('local_')) {
+        state.supabaseClient.from('miso_logs').delete().eq('id', id).then(() => fetchSupabaseLogs());
+        return;
+      }
+      state.logs = state.logs.filter((x, i) => (x.id || i) != id);
+      localStorage.setItem('miso_standalone_logs', JSON.stringify(state.logs));
+      renderLogs();
+    }
+
+    function initSupabase() {
+      const url = localStorage.getItem('supabase_url');
+      const key = localStorage.getItem('supabase_anon_key');
+      const notice = document.getElementById('sync-notice');
+
+      if (url && key && window.supabase) {
+        try {
+          state.supabaseClient = window.supabase.createClient(url.trim(), key.trim());
+          if (notice) notice.textContent = 'Supabaseと同期中（クラウド保存が有効です）';
+          fetchSupabaseLogs();
+          return;
+        } catch(e) {
+          console.error(e);
+        }
+      }
+      if (notice) notice.textContent = 'ブラウザのLocalStorageに保存されています。';
+      loadLocalLogs();
+    }
+
+    async function fetchSupabaseLogs() {
+      if (!state.supabaseClient) return;
+      try {
+        const { data, error } = await state.supabaseClient.from('miso_logs').select('*').order('created_at', { ascending: false });
+        if (!error && data) {
+          state.logs = data;
+          renderLogs();
+        } else {
+          loadLocalLogs();
+        }
+      } catch(e) {
+        loadLocalLogs();
+      }
+    }
+
+    function loadLocalLogs() {
+      try {
+        state.logs = JSON.parse(localStorage.getItem('miso_standalone_logs') || '[]');
+        renderLogs();
+      } catch(e) {
+        state.logs = [];
+      }
+    }
+
+    function initSeason() {
+      const m = new Date().getMonth() + 1;
+      if (m >= 3 && m <= 5) state.season = '春 (Spring)';
+      else if (m >= 6 && m <= 8) state.season = '夏 (Summer)';
+      else if (m >= 9 && m <= 11) state.season = '秋 (Autumn)';
+      else state.season = '冬 (Winter)';
+      document.getElementById('val-season').textContent = state.season;
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      initSeason();
+      setupEvents();
+      initSupabase();
+      render();
+    });
+  </script>
+</body>
 </html>
